@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'item.dart' as item;
 import 'addItem.dart' as add_item;
+import 'constants.dart' as specs;
+import 'itemData.service.dart' as item_data_service;
 
 void main() {
+  specs.Constants constants = specs.Constants();
   runApp(ShoppingListApp());
 }
 
@@ -55,12 +59,12 @@ class _ShoppingListState extends State<ShoppingList> {
 
   Widget _buildGrid() {
     return GridView.count(
-      crossAxisCount: 5,
+      crossAxisCount: specs.Constants.isMobile() ? 3 : 5,
       padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
-      children: List.generate(widget.groceries.length, (index) {
+      children: List.generate(item_data_service.ItemDataService.addedGroceries.length, (index) {
         return Container(
           padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-          child: itemBuilder.buildItem(widget.groceries[index], Colors.red),
+          child: itemBuilder.buildItem(item_data_service.ItemDataService.addedGroceries[index], Colors.red),
         );
       }),
     );
@@ -94,7 +98,6 @@ class onSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    debugPrint(context.toString());
     return Container();
   }
 
@@ -102,10 +105,11 @@ class onSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<String> suggestionList = [];
     query.isEmpty
-      ? suggestionList = addItem.suggestedGroceries
-      : suggestionList.addAll(addItem.suggestedGroceries.where(
+      ? suggestionList = item_data_service.ItemDataService.suggestedGroceries
+      : suggestionList.addAll(item_data_service.ItemDataService.suggestedGroceries.where(
             (element) => element.toLowerCase().contains(query.toLowerCase())
     ));
+
     return addItem.buildGrid(suggestionList);
   }
 

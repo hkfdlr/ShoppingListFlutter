@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'item.dart' as item;
+import 'constants.dart' as specs;
 
 class AddItem {
   item.ItemBuilder itemBuilder = item.ItemBuilder();
+  specs.Constants constants = specs.Constants();
+
 
   buildGrid(List<String> suggestionList) {
     return build(suggestionList);
@@ -10,7 +13,7 @@ class AddItem {
 
   Widget build(List<String> suggestionList) {
     return GridView.count(
-      crossAxisCount: 5,
+      crossAxisCount: specs.Constants.isMobile() ? 3 : 5,
       padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
       children: List.generate(suggestionList.length, (index) {
         return Container(
