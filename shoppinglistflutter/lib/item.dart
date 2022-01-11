@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class ItemBuilder {
-  buildItem(groceries) {
-    return _buildItem(groceries);
+  buildItem(String groceries, Color color) {
+    return _buildItem(groceries, color);
   }
 
-  Widget _buildItem(String groceries) {
+  Widget _buildItem(String groceries, Color color) {
     return ListTile(
       title: Text(
         groceries,
         style: const TextStyle(fontSize: 18.0),
       ),
       enabled: true,
-      tileColor: Colors.red,
+      tileColor: color,
     );
   }
 }

@@ -1,5 +1,27 @@
+import 'package:flutter/material.dart';
+import 'item.dart' as item;
+
 class AddItem {
-  final _suggestedGroceries = [
+  item.ItemBuilder itemBuilder = item.ItemBuilder();
+
+  buildGrid(List<String> suggestionList) {
+    return build(suggestionList);
+  }
+
+  Widget build(List<String> suggestionList) {
+    return GridView.count(
+      crossAxisCount: 5,
+      padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+      children: List.generate(suggestionList.length, (index) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+          child: itemBuilder.buildItem(suggestionList[index], Colors.green)
+        );
+      }),
+    );
+  }
+
+  var suggestedGroceries = [
     'Apple',
     'Banana',
     'Strawberry',
