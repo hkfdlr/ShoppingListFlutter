@@ -1,5 +1,9 @@
+import 'package:flutter/widgets.dart';
+import 'package:shoppinglistflutter/grocery.interface.dart';
+import 'package:collection/collection.dart';
+
 class ItemDataService {
-  static var addedGroceries = <String>['Test1', 'Test2'];
+  static var addedGroceries = [Grocery(name: 'Test1', amount: 1), Grocery(name: 'Test2', amount: 2)];
 
   static var suggestedGroceries = [
     'Apple','Banana','Strawberry', 'Avocado', 'Bell Pepper', 'Carrot', 'Garlic', 'Lemon',
@@ -12,14 +16,25 @@ class ItemDataService {
     'Black Beans', 'Soups', 'Tuna', 'Chili'
   ];
 
-  static addItem(groceries) {
-    addedGroceries.add(groceries);
+  static addItem(Grocery grocery) {
+    var groceryToCheck = addedGroceries.firstWhereOrNull((element) => element.name == grocery.name);
+    var index = -1;
+    if (groceryToCheck != null) {
+      index = addedGroceries.indexOf(groceryToCheck);
+    }
+    if (index > -1) {
+      addedGroceries[index].amount = addedGroceries[index].amount! + 1;
+    } else {
+      addedGroceries.add(Grocery(name: grocery.name, amount: grocery.amount));
+    }
     addedGroceries.sort((a,b) {
-      return a.toLowerCase().compareTo(b.toLowerCase());
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
     });
   }
 
-  static removeItem(groceries) {
-    addedGroceries.remove(groceries);
+  static removeItem(String grocery) {
+    var groceryToRemove = addedGroceries.firstWhere((element) => element.name == grocery);
+    var index = addedGroceries.indexOf(groceryToRemove);
+    addedGroceries.removeAt(index);
   }
 }

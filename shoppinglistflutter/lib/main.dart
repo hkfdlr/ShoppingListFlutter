@@ -1,20 +1,20 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'addItem.dart';
+import 'grocery.interface.dart';
 import 'item.dart' as item;
-import 'addItem.dart' as add_item;
 import 'constants.dart' as specs;
-import 'itemData.service.dart' as item_data_service;
+import 'itemData.service.dart';
 
 void main() {
-  specs.Constants constants = specs.Constants();
-  runApp(ShoppingListApp());
+  runApp(const ShoppingListApp());
 }
 
 class ShoppingListApp extends StatelessWidget {
+  const ShoppingListApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Shopping List App',
       home: ShoppingList(),
       debugShowCheckedModeBanner: false,
@@ -23,15 +23,18 @@ class ShoppingListApp extends StatelessWidget {
 }
 
 class ShoppingList extends StatefulWidget {
-  var groceries = <String>['Test1', 'Test2'];
+  const ShoppingList({Key? key}) : super(key: key);
 
   @override
   _ShoppingListState createState() => _ShoppingListState();
 }
 
 class _ShoppingListState extends State<ShoppingList> {
+  var isMobile = specs.Constants.isMobile();
+
   Icon searchBarIcon = const Icon(Icons.search);
   Widget appBarTitle = const Text('');
+  ItemDataService data = ItemDataService();
 
   item.ItemBuilder itemBuilder = item.ItemBuilder();
 
@@ -43,13 +46,10 @@ class _ShoppingListState extends State<ShoppingList> {
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-              onPressed: () {
-                showSearch(
-                    context: context,
-                    delegate: onSearch()
-                );
-              },
-              icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(context: context, delegate: onSearch(refresh));
+            },
+            icon: const Icon(Icons.search),
           )
         ],
       ),
@@ -58,21 +58,59 @@ class _ShoppingListState extends State<ShoppingList> {
   }
 
   Widget _buildGrid() {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return GridView.count(
-      crossAxisCount: specs.Constants.isMobile() ? 3 : 5,
-      padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
-      children: List.generate(item_data_service.ItemDataService.addedGroceries.length, (index) {
+      crossAxisCount: isMobile ? 3 : 5,
+      padding: EdgeInsets.fromLTRB(isMobile ? 0 : screenWidth / 4, 0, isMobile ? 8 : screenWidth / 4, 0),
+      children: List.generate(ItemDataService.addedGroceries.length, (index) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-          child: itemBuilder.buildItem(item_data_service.ItemDataService.addedGroceries[index], Colors.red),
+          padding: EdgeInsets.fromLTRB(isMobile ? 8 : 16, isMobile ? 8 : 16, 0, 0),
+          child: _buildItem(ItemDataService.addedGroceries[index]),
         );
       }),
     );
   }
+
+  Widget _buildItem(Grocery grocery) {
+    return ListTile(
+      title: Text(
+        grocery.name,
+        style: TextStyle(fontSize: isMobile ? 16 : 18),
+        textAlign: TextAlign.center,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: grocery.amount! > 1
+          ? Text(
+            'Amount: ${grocery.amount.toString()}',
+            style: TextStyle(fontSize: isMobile ? 16 : 18),
+            textAlign: TextAlign.center,
+          )
+          : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      enabled: true,
+      onTap: () {
+        setState(() {
+          ItemDataService.removeItem(grocery.name);
+        });
+      },
+      tileColor: Colors.red,
+      contentPadding: const EdgeInsets.all(4),
+    );
+  }
+
+  refresh() {
+    setState(() {});
+  }
 }
 
 class onSearch extends SearchDelegate {
-  add_item.AddItem addItem = add_item.AddItem();
+  item.ItemBuilder itemBuilder = item.ItemBuilder();
+  late Function() refresh;
+
+  onSearch(this.refresh);
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -81,8 +119,7 @@ class onSearch extends SearchDelegate {
           onPressed: () {
             query = "";
           },
-          icon: const Icon(Icons.close)
-      )
+          icon: const Icon(Icons.close))
     ];
   }
 
@@ -92,8 +129,7 @@ class onSearch extends SearchDelegate {
         onPressed: () {
           Navigator.pop(context);
         },
-        icon: const Icon(Icons.arrow_back)
-    );
+        icon: const Icon(Icons.arrow_back));
   }
 
   @override
@@ -105,12 +141,10 @@ class onSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<String> suggestionList = [];
     query.isEmpty
-      ? suggestionList = item_data_service.ItemDataService.suggestedGroceries
-      : suggestionList.addAll(item_data_service.ItemDataService.suggestedGroceries.where(
-            (element) => element.toLowerCase().contains(query.toLowerCase())
-    ));
+        ? suggestionList = ItemDataService.suggestedGroceries
+        : suggestionList.addAll(ItemDataService.suggestedGroceries.where(
+            (element) => element.toLowerCase().contains(query.toLowerCase())));
 
-    return addItem.buildGrid(suggestionList);
+    return AddItemPage(notifyParent: refresh, suggestionList: suggestionList);
   }
-
 }

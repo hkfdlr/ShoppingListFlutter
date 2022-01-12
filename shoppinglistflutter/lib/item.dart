@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:shoppinglistflutter/grocery.interface.dart';
 import 'constants.dart' as specs;
-import 'itemData.service.dart' as item_data_service;
+import 'itemData.service.dart';
 
 class ItemBuilder {
   specs.Constants constants = specs.Constants();
-
 
   buildItem(String groceries, Color color) {
     return _buildItem(groceries, color);
   }
 
-  Widget _buildItem(String groceries, Color color) {
+  Widget _buildItem(String grocery, Color color) {
     return ListTile(
       title: Text(
-          groceries,
+          grocery,
           style: TextStyle(fontSize: specs.Constants.isMobile() ? 16 : 18),
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
         ),
       enabled: true,
       onTap: () {
-        if (item_data_service.ItemDataService.addedGroceries.contains(groceries)) {
-          item_data_service.ItemDataService.removeItem(groceries);
-
+        if (ItemDataService.addedGroceries.contains(grocery)) {
+          ItemDataService.removeItem(grocery);
         } else {
-          item_data_service.ItemDataService.addItem(groceries);
-        }
+          ItemDataService.addItem(Grocery(name: grocery));
+        };
       },
       tileColor: color,
       contentPadding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
