@@ -34,7 +34,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
   Icon searchBarIcon = const Icon(Icons.search);
   Widget appBarTitle = const Text('');
-  ItemDataService data = ItemDataService();
+  ItemDataService itemDataService = ItemDataService();
 
   item.ItemBuilder itemBuilder = item.ItemBuilder();
 
@@ -47,7 +47,7 @@ class _ShoppingListState extends State<ShoppingList> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              showSearch(context: context, delegate: onSearch(refresh));
+              showSearch(context: context, delegate: onSearch(refresh, itemDataService));
             },
             icon: const Icon(Icons.search),
           )
@@ -63,10 +63,10 @@ class _ShoppingListState extends State<ShoppingList> {
     return GridView.count(
       crossAxisCount: isMobile ? 3 : 5,
       padding: EdgeInsets.fromLTRB(isMobile ? 0 : screenWidth / 4, 0, isMobile ? 8 : screenWidth / 4, 0),
-      children: List.generate(ItemDataService.addedGroceries.length, (index) {
+      children: List.generate(itemDataService.getAddedItems().length, (index) {
         return Container(
           padding: EdgeInsets.fromLTRB(isMobile ? 8 : 16, isMobile ? 8 : 16, 0, 0),
-          child: _buildItem(ItemDataService.addedGroceries[index]),
+          child: _buildItem(itemDataService.getAddedItems()[index]),
         );
       }),
     );
@@ -93,7 +93,7 @@ class _ShoppingListState extends State<ShoppingList> {
       enabled: true,
       onTap: () {
         setState(() {
-          ItemDataService.removeItem(grocery.name);
+          itemDataService.removeItem(grocery);
         });
       },
       tileColor: Colors.red,
@@ -109,8 +109,8 @@ class _ShoppingListState extends State<ShoppingList> {
 class onSearch extends SearchDelegate {
   item.ItemBuilder itemBuilder = item.ItemBuilder();
   late Function() refresh;
-
-  onSearch(this.refresh);
+  late ItemDataService itemDataService;
+  onSearch(this.refresh, this.itemDataService);
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -141,8 +141,8 @@ class onSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<String> suggestionList = [];
     query.isEmpty
-        ? suggestionList = ItemDataService.suggestedGroceries
-        : suggestionList.addAll(ItemDataService.suggestedGroceries.where(
+        ? suggestionList = itemDataService.getSuggestions()
+        : suggestionList.addAll(itemDataService.getSuggestions().where(
             (element) => element.toLowerCase().contains(query.toLowerCase())));
 
     return AddItemPage(notifyParent: refresh, suggestionList: suggestionList);

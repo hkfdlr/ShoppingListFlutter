@@ -8,6 +8,8 @@ import 'itemData.service.dart';
 class AddItemPage extends StatefulWidget {
   item.ItemBuilder itemBuilder = item.ItemBuilder();
   specs.Constants constants = specs.Constants();
+  ItemDataService itemDataService = ItemDataService();
+
   final Function() notifyParent;
   List<String> suggestionList;
 
@@ -50,15 +52,15 @@ class AddItemPageState extends State<AddItemPage> {
       ),
       enabled: true,
       onTap: () {
-        ItemDataService.addItem(Grocery(name: grocery.name, amount: 1));
-
+        widget.itemDataService.addItem(Grocery(name: grocery.name, amount: 1));
         widget.notifyParent();
+        List<Grocery> addedItems = widget.itemDataService.getAddedItems();
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: (ItemDataService.addedGroceries.firstWhereOrNull((element) => element.name == grocery.name)?.amount != null
-                && (ItemDataService.addedGroceries.firstWhereOrNull((element) => element.name == grocery.name)?.amount)! > 1)
-                ? Text('Added ${grocery.name} x${ItemDataService.addedGroceries.firstWhereOrNull((element) => element.name == grocery.name)?.amount}')
+            content: (addedItems.firstWhereOrNull((element) => element.name == grocery.name)?.amount != null
+                && (addedItems.firstWhereOrNull((element) => element.name == grocery.name)?.amount)! > 1)
+                ? Text('Added ${grocery.name} x${addedItems.firstWhereOrNull((element) => element.name == grocery.name)?.amount}')
                 : Text('Added ${grocery.name}'),
             duration: const Duration(milliseconds: 500),
           )

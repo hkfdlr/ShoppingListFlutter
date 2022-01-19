@@ -1,6 +1,5 @@
-import 'package:flutter/widgets.dart';
-import 'package:shoppinglistflutter/grocery.interface.dart';
 import 'package:collection/collection.dart';
+import 'package:shoppinglistflutter/grocery.interface.dart';
 
 class ItemDataService {
   static var addedGroceries = [Grocery(name: 'Test1', amount: 1), Grocery(name: 'Test2', amount: 2)];
@@ -16,7 +15,15 @@ class ItemDataService {
     'Black Beans', 'Soups', 'Tuna', 'Chili'
   ];
 
-  static addItem(Grocery grocery) {
+  getSuggestions() {
+    return suggestedGroceries;
+  }
+
+  getAddedItems() {
+    return addedGroceries;
+  }
+
+  addItem(Grocery grocery) {
     var groceryToCheck = addedGroceries.firstWhereOrNull((element) => element.name == grocery.name);
     var index = -1;
     if (groceryToCheck != null) {
@@ -32,8 +39,8 @@ class ItemDataService {
     });
   }
 
-  static removeItem(String grocery) {
-    var groceryToRemove = addedGroceries.firstWhere((element) => element.name == grocery);
+  removeItem(Grocery grocery) {
+    var groceryToRemove = addedGroceries.firstWhere((element) => element.name == grocery.name);
     var index = addedGroceries.indexOf(groceryToRemove);
     addedGroceries.removeAt(index);
   }

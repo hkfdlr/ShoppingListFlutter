@@ -6,6 +6,8 @@ import 'itemData.service.dart';
 class ItemBuilder {
   specs.Constants constants = specs.Constants();
 
+  ItemDataService itemDataService = ItemDataService();
+
   buildItem(String groceries, Color color) {
     return _buildItem(groceries, color);
   }
@@ -20,11 +22,7 @@ class ItemBuilder {
         ),
       enabled: true,
       onTap: () {
-        if (ItemDataService.addedGroceries.contains(grocery)) {
-          ItemDataService.removeItem(grocery);
-        } else {
-          ItemDataService.addItem(Grocery(name: grocery));
-        };
+        itemDataService.addItem(Grocery(name: grocery));
       },
       tileColor: color,
       contentPadding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
