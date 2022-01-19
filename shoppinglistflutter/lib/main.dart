@@ -140,10 +140,10 @@ class onSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> suggestionList = [];
+    List<String> allSuggestions = itemDataService.getSuggestions(); 
     query.isEmpty
-        ? suggestionList = itemDataService.getSuggestions()
-        : suggestionList.addAll(itemDataService.getSuggestions().where(
-            (element) => element.toLowerCase().contains(query.toLowerCase())));
+        ? suggestionList = allSuggestions
+        : suggestionList.addAll(allSuggestions.where((element) => element.toLowerCase().contains(query.toLowerCase())));
 
     return AddItemPage(notifyParent: refresh, suggestionList: suggestionList);
   }
